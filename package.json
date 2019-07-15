@@ -1,0 +1,26 @@
+{
+  "name": "puff",
+  "version": "0.0.1",
+  "description": "puff",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elcarim5efil/puff.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elcarim5efil/puff/issues"
+  },
+  "homepage": "https://github.com/elcarim5efil/puff#readme",
+  "dependencies": {
+    "precinct": "^6.1.2",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0"
+  }
+}

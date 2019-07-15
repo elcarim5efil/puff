@@ -1,0 +1,1 @@
+const two = require('./2');
