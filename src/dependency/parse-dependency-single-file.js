@@ -1,5 +1,5 @@
 const precinct = require('precinct');
-const fs = require('fs');
+const fs = require('fs-extra');
 
 function parseDependencySingleFile(filePath) {
   return new Promise(async (resolve, reject) => {

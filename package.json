@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/elcarim5efil/puff#readme",
   "dependencies": {
+    "fs-extra": "^8.1.0",
     "precinct": "^6.1.2",
     "vue-template-compiler": "^2.6.10"
   },

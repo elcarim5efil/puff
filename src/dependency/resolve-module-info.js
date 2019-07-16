@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const { parseDependencySingleFile } = require('./parse-dependency-single-file');
+const { parseDependencyVue } = require('./parse-dependency-vue');
 
 
 function isExternalModule(moduleName) {
@@ -72,8 +73,13 @@ async function resolveModuleInfo(moduleName, root) {
     if (cachedModuleInfo) {
       info.dependencyPaths = cachedModuleInfo.dependencyPaths;
     } else {
-      const { dependencyPaths } = await parseDependencySingleFile(info.filePath);
-      info.dependencyPaths = dependencyPaths;
+      if (info.type === 'vue') {
+        const { dependencyPaths } = await parseDependencyVue(info.filePath);
+        info.dependencyPaths = dependencyPaths;
+      } else {
+        const { dependencyPaths } = await parseDependencySingleFile(info.filePath);
+        info.dependencyPaths = dependencyPaths;
+      }
     }
   }
 
