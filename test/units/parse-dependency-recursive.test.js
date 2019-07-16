@@ -18,7 +18,7 @@ describe('parseDependencyRecursive', () => {
     expect(flattenDependencyFilePaths).toHaveLength(2);
     expect(flattenDependencyFilePaths).toEqual([
       resolvePath('test/fixtures/modules/import-a.js'),
-      resolvePath('test/fixtures/modules/a.js')
+      resolvePath('test/fixtures/modules/a.js'),
     ]);
 
     expect(entry.type).toBe('js');
@@ -38,7 +38,7 @@ describe('parseDependencyRecursive', () => {
     expect(flattenDependencyFilePaths).toHaveLength(2);
     expect(flattenDependencyFilePaths).toEqual([
       resolvePath('test/fixtures/modules/require-a.js'),
-      resolvePath('test/fixtures/modules/a.js')
+      resolvePath('test/fixtures/modules/a.js'),
     ]);
 
     expect(entry.type).toBe('js');
@@ -48,7 +48,7 @@ describe('parseDependencyRecursive', () => {
     expect(entry.dependencies).toHaveLength(1);
   });
 
-  test('es module: import', async () => {
+  test('depth', async () => {
     const entryPath = resolvePath('test/fixtures/modules/import-a-and-b.js');
     const res = await parseDependencyRecursive(entryPath);
     const {
@@ -56,21 +56,11 @@ describe('parseDependencyRecursive', () => {
       flattenDependencyFilePaths,
       entry
     } = res;
-    // console.log(flattenDependencyFilePaths);
-    // console.log(entry);
-    console.log(maxDepth);
-    console.log(entry.dependencies);
-    console.log(entry.dependencies[1]);
-    // expect(flattenDependencyFilePaths).toHaveLength(2);
-    // expect(flattenDependencyFilePaths).toEqual([
-    //   resolvePath('test/fixtures/modules/import-a.js'),
-    //   resolvePath('test/fixtures/modules/a.js')
-    // ]);
 
-    // expect(entry.type).toBe('js');
-    // expect(entry.parent).toBeNull();
-    // expect(entry.parentFilePath).toBeNull();
-    // expect(entry.dependencyPaths).toHaveLength(1);
-    // expect(entry.dependencies).toHaveLength(1);
+    expect(maxDepth).toBe(2);
+    expect(entry.depth).toBe(0);
+    expect(entry.dependencies[0].depth).toBe(1);
+    expect(entry.dependencies[1].depth).toBe(1);
+    expect(entry.dependencies[1].dependencies[0].depth).toBe(2);
   });
 });
