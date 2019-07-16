@@ -1,58 +1,55 @@
 const fs = require('fs');
 const path = require('path');
-const { parseDependencySingleFile } = require('./parse-dependency-single-file');
 const { resolveModuleInfo } = require('./resolve-module-info');
 
 async function parseDependencyRecursive(modulePath) {
   const moduleQueque = [];
   const moduleCache = {};
   const flattenDependencyFilePaths = [];
+  let maxDepth = 0;
+
   const moduleInfo = await resolveModuleInfo(modulePath);
-  const entryModule = createModule({
-    name: moduleInfo.moduleName,
-    filePath: moduleInfo.absolutePath,
-    type: moduleInfo.type,
-    dependencyPaths: moduleInfo.dependencyPaths
-  })
+  const entryModule = createModule(Object.assign({
+    depth: 0
+  }, moduleInfo))
+
   moduleQueque.push(entryModule);
 
   while(moduleQueque.length > 0) {
     const currentModule = moduleQueque.shift();
     let currentModuleDependencyInfo;
 
-    // add cache
-    moduleCache[currentModule.filePath] = currentModule;
-
     // add flatten dependency path
     flattenDependencyFilePaths.push(currentModule.filePath);
 
+    // process dependencies
     for (let i = 0; i < currentModule.dependencyPaths.length; ++i) {
       const dependencyPath = currentModule.dependencyPaths[i];
-      const moduleInfo = await resolveModuleInfo(dependencyPath, currentModule.filePath);
+      const dependencyModuleInfo = await resolveModuleInfo(dependencyPath, currentModule.filePath);
       let dependencyModule;
-      if (moduleCache[moduleInfo.absolutePath]) {
-        dependencyModule = moduleCache[moduleInfo.absolutePath];
+      if (moduleCache[dependencyModuleInfo.filePath]) {
+        dependencyModule = Object.assign({}, moduleCache[dependencyModuleInfo.filePath]);
       } else {
-        dependencyModule = createModule({
-          name: moduleInfo.moduleName,
-          filePath: moduleInfo.absolutePath,
-          external: moduleInfo.external,
-          type: moduleInfo.type,
-          dependencyPaths: moduleInfo.dependencyPaths,
-          parent: currentModule,
-        });
+        dependencyModule = createModule(dependencyModuleInfo);
 
         // parse dependencies' dependencies
-        if (!moduleInfo.external) {
+        if (!dependencyModuleInfo.external) {
           moduleQueque.push(dependencyModule);
         }
       }
 
+      dependencyModule.parent = currentModule;
+      dependencyModule.depth = currentModule.depth + 1;
+      maxDepth = Math.max(maxDepth, dependencyModule.depth);
       currentModule.dependencies.push(dependencyModule);
     }
+
+    // add cache
+    moduleCache[currentModule.filePath] = Object.assign({}, currentModule);
   }
 
   return {
+    maxDepth,
     flattenDependencyFilePaths,
     entry: entryModule,
   };
@@ -62,18 +59,21 @@ function createModule({
   name,
   filePath,
   type,
-  parent,
-  dependencyPaths = []
+  dependencyPaths = [],
+  dependencies = [],
+  external = false,
+  depth = null,
 }) {
-  const parentFilePath = parent && parent.filePath || null;
   return {
     name,
     filePath,
     type,
     parent: null,
-    parentFilePath,
+    parentFilePath: null,
     dependencyPaths,
-    dependencies: [],
+    dependencies,
+    depth,
+    external,
   };
 }
 

@@ -13,19 +13,19 @@ function resolveModuleType(filePath) {
 }
 
 function resolveModuleFilePath(moduleName, root) {
-  let absolutePath = moduleName;
+  let filePath = moduleName;
   let fileMatched = false;
   if (root) {
     const rootDirname = path.dirname(root);
-    absolutePath = path.resolve(rootDirname, moduleName);
+    filePath = path.resolve(rootDirname, moduleName);
   }
 
   // found dir or file
-  if (fs.existsSync(absolutePath)) {
-    const stat = fs.statSync(absolutePath);
+  if (fs.existsSync(filePath)) {
+    const stat = fs.statSync(filePath);
     // ./path/to/module/
     if (stat.isDirectory()) {
-      absolutePath = path.resolve(absolutePath, 'index');
+      filePath = path.resolve(filePath, 'index');
     // ./path/to/module/index[.ext]
     } else {
       fileMatched = true;
@@ -37,22 +37,22 @@ function resolveModuleFilePath(moduleName, root) {
   if (!fileMatched) {
     const tryType = [ 'js', 'vue' ];
     tryType.some((type) => {
-      let tempAbsolutePath = `${absolutePath}.${type}`;
-      if (fs.existsSync(tempAbsolutePath)) {
-        absolutePath = tempAbsolutePath;
+      let tempFilePath = `${filePath}.${type}`;
+      if (fs.existsSync(tempFilePath)) {
+        filePath = tempFilePath;
         return true;
       }
     });
   }
 
-  return absolutePath;
+  return filePath;
 }
 
 const moduleInfoCache = {};
 async function resolveModuleInfo(moduleName, root) {
   const info = {
-      moduleName,
-      absolutePath: null,
+      name: moduleName,
+      filePath: null,
       external: false,
       type: null,
   };
@@ -60,19 +60,19 @@ async function resolveModuleInfo(moduleName, root) {
   if (isExternalModule(moduleName)) {
     Object.assign(info, { external: true });
   } else {
-    const absolutePath = resolveModuleFilePath(moduleName, root);
+    const filePath = resolveModuleFilePath(moduleName, root);
     Object.assign(info, {
-      type: resolveModuleType(absolutePath),
-      absolutePath: absolutePath,
+      type: resolveModuleType(filePath),
+      filePath,
     });
   }
 
-  if (info.absolutePath && !info.dependencyPaths) {
-    const cachedModuleInfo = moduleInfoCache[info.absolutePath]
+  if (info.filePath && !info.dependencyPaths) {
+    const cachedModuleInfo = moduleInfoCache[info.filePath]
     if (cachedModuleInfo) {
       info.dependencyPaths = cachedModuleInfo.dependencyPaths;
     } else {
-      const { dependencyPaths } = await parseDependencySingleFile(info.absolutePath);
+      const { dependencyPaths } = await parseDependencySingleFile(info.filePath);
       info.dependencyPaths = dependencyPaths;
     }
   }
