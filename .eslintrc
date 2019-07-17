@@ -1,0 +1,13 @@
+{
+  "extends": ["airbnb"],
+  "plugins": [],
+  "rules": {
+    "global-require": "off",
+    "import/no-dynamic-require": "off",
+    "no-await-in-loop": "off"
+  },
+  "env": {
+    "node": true,
+    "mocha": true
+  }
+}

@@ -7,7 +7,7 @@ function findCircleNoRecursive(root) {
 
   pending.push(root);
 
-  while(pending.length) {
+  while (pending.length) {
     let shouldbreak = false;
     current = pending.pop();
     if (stack[stack.length - 1] !== current.filePath) {
@@ -15,13 +15,13 @@ function findCircleNoRecursive(root) {
     }
     visited.push(current.filePath);
 
-    for(let i = current.dependencies.length - 1; i >= 0; --i) {
+    for (let i = current.dependencies.length - 1; i >= 0; i -= 1) {
       const node = current.dependencies[i];
       const indexInStack = stack.indexOf(node.filePath);
       if (indexInStack > -1) {
         res.push(
           stack.slice(indexInStack)
-            .concat(node.filePath)
+            .concat(node.filePath),
         );
       }
 
@@ -41,7 +41,6 @@ function findCircleNoRecursive(root) {
     }
   }
 
-  console.log(visited);
   return res;
 }
 

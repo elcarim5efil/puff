@@ -1,6 +1,26 @@
-const fs = require('fs');
-const path = require('path');
 const { resolveModuleInfo } = require('./resolve-module-info');
+
+function createModule({
+  name,
+  filePath,
+  type,
+  dependencyPaths = [],
+  dependencies = [],
+  external = false,
+  depth = null,
+}) {
+  return {
+    name,
+    filePath,
+    type,
+    parent: null,
+    parentFilePath: null,
+    dependencyPaths,
+    dependencies,
+    depth,
+    external,
+  };
+}
 
 async function parseDependencyRecursive(modulePath) {
   const moduleQueque = [];
@@ -11,20 +31,19 @@ async function parseDependencyRecursive(modulePath) {
 
   const moduleInfo = await resolveModuleInfo(modulePath);
   const entryModule = createModule(Object.assign({
-    depth: 0
-  }, moduleInfo))
+    depth: 0,
+  }, moduleInfo));
 
   moduleQueque.push(entryModule);
 
-  while(moduleQueque.length > 0) {
+  while (moduleQueque.length > 0) {
     const currentModule = moduleQueque.shift();
-    let currentModuleDependencyInfo;
 
     // add flatten dependency path
     flattenDependencyFilePaths.push(currentModule.filePath);
 
     // process dependencies
-    for (let i = 0; i < currentModule.dependencyPaths.length; ++i) {
+    for (let i = 0; i < currentModule.dependencyPaths.length; i += 1) {
       const dependencyPath = currentModule.dependencyPaths[i];
       const dependencyModuleInfo = await resolveModuleInfo(dependencyPath, currentModule.filePath);
       let dependencyModule;
@@ -59,27 +78,6 @@ async function parseDependencyRecursive(modulePath) {
   };
 }
 
-function createModule({
-  name,
-  filePath,
-  type,
-  dependencyPaths = [],
-  dependencies = [],
-  external = false,
-  depth = null,
-}) {
-  return {
-    name,
-    filePath,
-    type,
-    parent: null,
-    parentFilePath: null,
-    dependencyPaths,
-    dependencies,
-    depth,
-    external,
-  };
-}
 
 module.exports = {
   parseDependencyRecursive,

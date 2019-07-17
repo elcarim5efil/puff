@@ -6,23 +6,21 @@ function resolveExternalModuleName(requireName) {
   if (/^@[^/]/.test(requireName)) {
     return requireName.split('/').slice(0, 2).join('/');
   // 'name/xxx'
-  } else if (/^@\//.test(requireName)) {
+  } if (/^@\//.test(requireName)) {
     return requireName.split('/')[0];
   // alias '@/name'
-  } else {
-    return requireName;
   }
+  return requireName;
 }
 
 function findPackageJsonPath(rootPath) {
   let pathParts = rootPath.split(path.sep);
-  while(pathParts.length > 0) {
+  while (pathParts.length > 0) {
     const tempPath = path.resolve(pathParts.join(path.sep), 'package.json');
     if (fs.existsSync(tempPath)) {
       return tempPath;
-    } else {
-      pathParts = pathParts.slice(0, pathParts.length - 1);
     }
+    pathParts = pathParts.slice(0, pathParts.length - 1);
   }
   return null;
 }
@@ -34,12 +32,11 @@ function findPackageJson(rootPath) {
   if (packageJsonPath) {
     if (packageJsonCache[packageJsonPath]) {
       return packageJsonCache[packageJsonPath];
-    } else {
-      content = fs.readFileSync(packageJsonPath, 'utf8');
-      const json = JSON.parse(content);
-      packageJsonCache[packageJsonPath] = json;
-      return json;
     }
+    content = fs.readFileSync(packageJsonPath, 'utf8');
+    const json = JSON.parse(content);
+    packageJsonCache[packageJsonPath] = json;
+    return json;
   }
   return null;
 }
@@ -50,7 +47,7 @@ function resolveModuleInfoExternal(requireName, rootPath) {
   const {
     dependencies = {},
     devDependencies = {},
-    peerDependencies = {}
+    peerDependencies = {},
   } = packageJson;
   const deps = {
     dependencies,
@@ -70,6 +67,7 @@ function resolveModuleInfoExternal(requireName, rootPath) {
       });
       return true;
     }
+    return false;
   });
 
   return res;

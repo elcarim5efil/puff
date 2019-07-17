@@ -5,7 +5,7 @@ const { parseDependencyVue } = require('./parse-dependency-vue');
 const { resolveModuleInfoExternal } = require('./resolve-module-info-external');
 
 function isExternalModule(moduleName) {
-  return !/^[\.|\/]/.test(moduleName);
+  return !/^[.|/]/.test(moduleName);
 }
 
 function resolveModuleType(filePath) {
@@ -31,18 +31,19 @@ function resolveModuleFilePath(moduleName, root) {
     } else {
       fileMatched = true;
     }
-  } 
+  }
 
   // ./path/to/module/index[.ext]
   // ./path/to/module[.ext]
   if (!fileMatched) {
-    const tryType = [ 'js', 'vue' ];
+    const tryType = ['js', 'vue'];
     tryType.some((type) => {
-      let tempFilePath = `${filePath}.${type}`;
+      const tempFilePath = `${filePath}.${type}`;
       if (fs.existsSync(tempFilePath)) {
         filePath = tempFilePath;
         return true;
       }
+      return false;
     });
   }
 
@@ -52,10 +53,10 @@ function resolveModuleFilePath(moduleName, root) {
 const moduleInfoCache = {};
 async function resolveModuleInfo(moduleName, root) {
   const info = {
-      name: moduleName,
-      filePath: null,
-      external: false,
-      type: null,
+    name: moduleName,
+    filePath: null,
+    external: false,
+    type: null,
   };
 
   if (isExternalModule(moduleName)) {
@@ -70,17 +71,15 @@ async function resolveModuleInfo(moduleName, root) {
   }
 
   if (info.filePath && !info.dependencyPaths) {
-    const cachedModuleInfo = moduleInfoCache[info.filePath]
+    const cachedModuleInfo = moduleInfoCache[info.filePath];
     if (cachedModuleInfo) {
       info.dependencyPaths = cachedModuleInfo.dependencyPaths;
+    } else if (info.type === 'vue') {
+      const { dependencyPaths } = await parseDependencyVue(info.filePath);
+      info.dependencyPaths = dependencyPaths;
     } else {
-      if (info.type === 'vue') {
-        const { dependencyPaths } = await parseDependencyVue(info.filePath);
-        info.dependencyPaths = dependencyPaths;
-      } else {
-        const { dependencyPaths } = await parseDependencySingleFile(info.filePath);
-        info.dependencyPaths = dependencyPaths;
-      }
+      const { dependencyPaths } = await parseDependencySingleFile(info.filePath);
+      info.dependencyPaths = dependencyPaths;
     }
   }
 

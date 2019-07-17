@@ -2,16 +2,17 @@ const precinct = require('precinct');
 const fs = require('fs-extra');
 const { parseComponent } = require('vue-template-compiler');
 
-function  collectScriptDependencies(script) {
-  const { content, lang } = script;
+function collectScriptDependencies(script) {
+  const { content } = script;
   if (content) {
     const dependencyPaths = precinct(content, {
       es6: {
-        mixedImports: true
-      }
+        mixedImports: true,
+      },
     });
     return dependencyPaths;
   }
+  return [];
 }
 
 function collectStylesDependencies(styles) {
@@ -42,7 +43,7 @@ function parseDependencyVue(filePath) {
       } else {
         reject(err);
       }
-    })
+    });
   });
 }
 

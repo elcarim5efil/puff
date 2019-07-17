@@ -7,8 +7,8 @@ function parseDependencySingleFile(filePath) {
       if (!err) {
         const dependencyPaths = precinct(content, {
           es6: {
-            mixedImports: true
-          }
+            mixedImports: true,
+          },
         });
         const res = {
           path: filePath,
@@ -19,7 +19,7 @@ function parseDependencySingleFile(filePath) {
       } else {
         reject(err);
       }
-    })
+    });
   });
 }
 

@@ -6,7 +6,7 @@ function findCircle(root, stack = [], visited = [], res = []) {
     if (indexInStack > -1) {
       res.push(
         stack.slice(indexInStack)
-          .concat(node.filePath)
+          .concat(node.filePath),
       );
     }
     if (visited.indexOf(node.filePath) === -1) {
