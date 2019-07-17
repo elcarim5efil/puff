@@ -6,6 +6,7 @@ async function parseDependencyRecursive(modulePath) {
   const moduleQueque = [];
   const moduleCache = {};
   const flattenDependencyFilePaths = [];
+  const externals = [];
   let maxDepth = 0;
 
   const moduleInfo = await resolveModuleInfo(modulePath);
@@ -35,6 +36,8 @@ async function parseDependencyRecursive(modulePath) {
         // parse dependencies' dependencies
         if (!dependencyModuleInfo.external) {
           moduleQueque.push(dependencyModule);
+        } else {
+          externals.push(dependencyModuleInfo);
         }
       }
 
@@ -52,6 +55,7 @@ async function parseDependencyRecursive(modulePath) {
     maxDepth,
     flattenDependencyFilePaths,
     entry: entryModule,
+    externals,
   };
 }
 

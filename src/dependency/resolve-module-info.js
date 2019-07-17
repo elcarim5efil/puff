@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const { parseDependencySingleFile } = require('./parse-dependency-single-file');
 const { parseDependencyVue } = require('./parse-dependency-vue');
-
+const { resolveModuleInfoExternal } = require('./resolve-module-info-external');
 
 function isExternalModule(moduleName) {
   return !/^[\.|\/]/.test(moduleName);
@@ -59,7 +59,8 @@ async function resolveModuleInfo(moduleName, root) {
   };
 
   if (isExternalModule(moduleName)) {
-    Object.assign(info, { external: true });
+    const externalModuleInfo = resolveModuleInfoExternal(moduleName, root);
+    Object.assign(info, { external: true }, externalModuleInfo);
   } else {
     const filePath = resolveModuleFilePath(moduleName, root);
     Object.assign(info, {
