@@ -2,7 +2,7 @@
   "name": "puff",
   "version": "0.0.1",
   "description": "puff",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
     "test:ci": "jest --ci --coverage",
