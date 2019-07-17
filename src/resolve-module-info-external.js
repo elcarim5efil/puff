@@ -1,6 +1,19 @@
 const path = require('path');
 const fs = require('fs');
 
+function resolveExternalModuleName(requireName) {
+  // '@scope/name'
+  if (/^@[^/]/.test(requireName)) {
+    return requireName.split('/').slice(0, 2).join('/');
+  // 'name/xxx'
+  } else if (/^@\//.test(requireName)) {
+    return requireName.split('/')[0];
+  // alias '@/name'
+  } else {
+    return requireName;
+  }
+}
+
 function findPackageJsonPath(rootPath) {
   let pathParts = rootPath.split(path.sep);
   while(pathParts.length > 0) {
@@ -31,7 +44,8 @@ function findPackageJson(rootPath) {
   return null;
 }
 
-function resolveModuleInfoExternal(moduleName, rootPath) {
+function resolveModuleInfoExternal(requireName, rootPath) {
+  const moduleName = resolveExternalModuleName(requireName);
   const packageJson = findPackageJson(rootPath) || {};
   const {
     dependencies = {},
@@ -49,6 +63,8 @@ function resolveModuleInfoExternal(moduleName, rootPath) {
     const dep = deps[dependencyType];
     if (dep[moduleName]) {
       Object.assign(res, {
+        requireName,
+        moduleName,
         dependencyType,
         version: dep[moduleName],
       });
@@ -61,4 +77,5 @@ function resolveModuleInfoExternal(moduleName, rootPath) {
 
 module.exports = {
   resolveModuleInfoExternal,
+  resolveExternalModuleName,
 };
