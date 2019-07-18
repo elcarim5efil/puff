@@ -1,18 +1,15 @@
 const precinct = require('precinct');
-const fs = require('fs-extra');
 const { parseComponent } = require('vue-template-compiler');
+const { readFile } = require('./read-file');
 
 function collectScriptDependencies(script) {
   const { content } = script;
-  if (content) {
-    const dependencyPaths = precinct(content, {
-      es6: {
-        mixedImports: true,
-      },
-    });
-    return dependencyPaths;
-  }
-  return [];
+  const dependencyPaths = precinct(content, {
+    es6: {
+      mixedImports: true,
+    },
+  });
+  return dependencyPaths;
 }
 
 function collectStylesDependencies(styles) {
@@ -23,30 +20,28 @@ function collectStylesDependencies(styles) {
   }, []);
 }
 
-function parseDependencyVue(filePath) {
-  return new Promise(async (resolve, reject) => {
-    fs.readFile(filePath, { encoding: 'utf8' }, (err, content) => {
-      if (!err) {
-        const discriptor = parseComponent(content);
-        const { script, styles } = discriptor;
-        const scriptDependencyPaths = collectScriptDependencies(script);
-        const styleDependencyPaths = collectStylesDependencies(styles);
-        const dependencyPaths = [].concat(scriptDependencyPaths).concat(styleDependencyPaths);
+function parseDependencyVueContent(content) {
+  const discriptor = parseComponent(content);
+  const { script, styles } = discriptor;
+  const scriptDependencyPaths = collectScriptDependencies(script);
+  const styleDependencyPaths = collectStylesDependencies(styles);
+  const dependencyPaths = [].concat(scriptDependencyPaths).concat(styleDependencyPaths);
+  return dependencyPaths;
+}
 
-        const res = {
-          path: filePath,
-          absolutePath: filePath,
-          dependencyPaths,
-        };
-
-        resolve(res);
-      } else {
-        reject(err);
-      }
-    });
-  });
+async function parseDependencyVue(filePath) {
+  const content = await readFile(filePath);
+  const dependencyPaths = parseDependencyVueContent(content);
+  return {
+    path: filePath,
+    absolutePath: filePath,
+    dependencyPaths,
+  };
 }
 
 module.exports = {
   parseDependencyVue,
+  parseDependencyVueContent,
+  collectScriptDependencies,
+  collectStylesDependencies,
 };
