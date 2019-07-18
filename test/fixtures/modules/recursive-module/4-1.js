@@ -1,0 +1,1 @@
+const one = require('./4-2');

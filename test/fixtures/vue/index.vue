@@ -2,16 +2,17 @@
   <div></div> 
 </template>
 
-<script>
-import index from './index';
+<script lang="typescript">
+import lodash from 'lodash';
+import log from './log';
+
 export default {
   data() {
 
   }
 }
 </script>
-
 <style lang="less">
-@import './index.less';
+@import './common.less';
 </style>
 

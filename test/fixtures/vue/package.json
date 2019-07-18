@@ -1,0 +1,30 @@
+{
+  "name": "puff-test-packagejson",
+  "version": "0.0.1",
+  "description": "puff",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:ci": "jest --ci --coverage",
+    "test:dev": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elcarim5efil/puff.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elcarim5efil/puff/issues"
+  },
+  "homepage": "https://github.com/elcarim5efil/puff#readme",
+  "dependencies": {
+    "lodash": "^4.17.14"
+  },
+  "devDependencies": {
+    "vuex": "latest"
+  },
+  "peerDependencies": {
+    "webpack": "5"
+  }
+}
