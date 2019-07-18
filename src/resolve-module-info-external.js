@@ -1,44 +1,8 @@
-const path = require('path');
-const fs = require('fs');
+const { findPackageJson } = require('./find-package-json');
+const { resolveExternalModuleName } = require('./resolve-external-module-name');
 
-function resolveExternalModuleName(requireName) {
-  // '@scope/name'
-  if (/^@[^/]/.test(requireName)) {
-    return requireName.split('/').slice(0, 2).join('/');
-  // 'name/xxx'
-  } if (/^@\//.test(requireName)) {
-    return requireName.split('/')[0];
-  // alias '@/name'
-  }
-  return requireName;
-}
-
-function findPackageJsonPath(rootPath) {
-  let pathParts = rootPath.split(path.sep);
-  while (pathParts.length > 0) {
-    const tempPath = path.resolve(pathParts.join(path.sep), 'package.json');
-    if (fs.existsSync(tempPath)) {
-      return tempPath;
-    }
-    pathParts = pathParts.slice(0, pathParts.length - 1);
-  }
-  return null;
-}
-
-const packageJsonCache = {};
-function findPackageJson(rootPath) {
-  const packageJsonPath = findPackageJsonPath(rootPath);
-  let content;
-  if (packageJsonPath) {
-    if (packageJsonCache[packageJsonPath]) {
-      return packageJsonCache[packageJsonPath];
-    }
-    content = fs.readFileSync(packageJsonPath, 'utf8');
-    const json = JSON.parse(content);
-    packageJsonCache[packageJsonPath] = json;
-    return json;
-  }
-  return null;
+function isExternalModule(moduleName) {
+  return !/^[.|/]/.test(moduleName);
 }
 
 function resolveModuleInfoExternal(requireName, rootPath) {
@@ -74,6 +38,7 @@ function resolveModuleInfoExternal(requireName, rootPath) {
 }
 
 module.exports = {
+  isExternalModule,
   resolveModuleInfoExternal,
   resolveExternalModuleName,
 };
