@@ -1,0 +1,14 @@
+{
+  "name": "puff.test.modules.package.json",
+  "version": "0.0.1",
+  "description": "puff",
+  "dependencies": {
+    "lodash": "^4.17.14"
+  },
+  "devDependencies": {
+    "vuex": "latest"
+  },
+  "peerDependencies": {
+    "webpack": "5"
+  }
+}
