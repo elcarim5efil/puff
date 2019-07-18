@@ -1,5 +1,5 @@
 const path = require('path');
-const { parseDependencyRecursive } = require('../../src/dependency/parse-dependency-recursive');
+const { parseDependencyRecursive } = require('../../src/parse-dependency-recursive');
 
 const cwd = process.cwd();
 function resolvePath(...args) {
@@ -7,13 +7,12 @@ function resolvePath(...args) {
 }
 
 describe('parseDependencyRecursive', () => {
-
   test('es module: import', async () => {
     const entryPath = resolvePath('test/fixtures/modules/import-a.js');
     const res = await parseDependencyRecursive(entryPath);
     const {
       flattenDependencyFilePaths,
-      entry
+      entry,
     } = res;
     expect(flattenDependencyFilePaths).toHaveLength(2);
     expect(flattenDependencyFilePaths).toEqual([
@@ -33,7 +32,7 @@ describe('parseDependencyRecursive', () => {
     const res = await parseDependencyRecursive(entryPath);
     const {
       flattenDependencyFilePaths,
-      entry
+      entry,
     } = res;
     expect(flattenDependencyFilePaths).toHaveLength(2);
     expect(flattenDependencyFilePaths).toEqual([
@@ -53,8 +52,8 @@ describe('parseDependencyRecursive', () => {
     const res = await parseDependencyRecursive(entryPath);
     const {
       maxDepth,
-      flattenDependencyFilePaths,
-      entry
+      // flattenDependencyFilePaths,
+      entry,
     } = res;
 
     expect(maxDepth).toBe(2);
@@ -63,4 +62,19 @@ describe('parseDependencyRecursive', () => {
     expect(entry.dependencies[1].depth).toBe(1);
     expect(entry.dependencies[1].dependencies[0].depth).toBe(2);
   });
+
+  // test('circle\'s depth', async () => {
+  //   const entryPath = resolvePath('test/fixtures/modules/recursive-module/1.js');
+  //   const res = await parseDependencyRecursive(entryPath);
+  //   const {
+  //     maxDepth,
+  //     flattenDependencyFilePaths,
+  //     entry
+  //   } = res;
+
+  //   expect(maxDepth).toBe(4);
+  //   expect(entry.depth).toBe(0);
+  //   expect(entry.dependencies[0].depth).toBe(1);
+  //   expect(entry.dependencies[0].dependencies[0].depth).toBe(2);
+  // });
 });
