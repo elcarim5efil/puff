@@ -2,13 +2,13 @@ const path = require('path');
 const fs = require('fs');
 const { parseDependencySingleFile } = require('./parse-dependency-single-file');
 const { parseDependencyVue } = require('./parse-dependency-vue');
-const { resolveModuleInfoExternal } = require('./resolve-module-info-external');
+const { resolveAliasPath } = require('./resolve-alias-path');
+const {
+  isExternalModule,
+  resolveModuleInfoExternal,
+} = require('./resolve-module-info-external');
 
-function isExternalModule(moduleName) {
-  return !/^[.|/]/.test(moduleName);
-}
-
-function resolveModuleType(filePath) {
+function resolveModuleFileType(filePath) {
   const ext = path.extname(filePath);
   return ext.substr(1);
 }
@@ -51,9 +51,10 @@ function resolveModuleFilePath(moduleName, root) {
 }
 
 const moduleInfoCache = {};
-async function resolveModuleInfo(moduleName, root) {
+async function resolveModuleInfo(requireName, root, options = {}) {
+  const moduleName = resolveAliasPath(requireName, options.alias);
   const info = {
-    name: moduleName,
+    name: requireName,
     filePath: null,
     external: false,
     type: null,
@@ -65,7 +66,7 @@ async function resolveModuleInfo(moduleName, root) {
   } else {
     const filePath = resolveModuleFilePath(moduleName, root);
     Object.assign(info, {
-      type: resolveModuleType(filePath),
+      type: resolveModuleFileType(filePath),
       filePath,
     });
   }
@@ -87,5 +88,7 @@ async function resolveModuleInfo(moduleName, root) {
 }
 
 module.exports = {
+  resolveModuleFileType,
+  resolveModuleFilePath,
   resolveModuleInfo,
 };
