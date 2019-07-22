@@ -2,7 +2,7 @@ const precinct = require('precinct');
 const { parseComponent } = require('vue-template-compiler');
 const { readFile } = require('./read-file');
 
-function collectScriptDependencies(script) {
+function collectScriptDependenciesVue(script) {
   const { content } = script;
   const dependencyPaths = precinct(content, {
     es6: {
@@ -12,7 +12,7 @@ function collectScriptDependencies(script) {
   return dependencyPaths;
 }
 
-function collectStylesDependencies(styles) {
+function collectStylesDependenciesVue(styles) {
   return styles.reduce((res, style) => {
     const { content, lang } = style;
     const dependencyPaths = precinct(content, { type: lang });
@@ -20,18 +20,18 @@ function collectStylesDependencies(styles) {
   }, []);
 }
 
-function parseDependencyVueContent(content) {
-  const discriptor = parseComponent(content);
-  const { script, styles } = discriptor;
-  const scriptDependencyPaths = collectScriptDependencies(script);
-  const styleDependencyPaths = collectStylesDependencies(styles);
+function resolveDependencyVueByContent(content) {
+  const descriptor = parseComponent(content);
+  const { script, styles } = descriptor;
+  const scriptDependencyPaths = collectScriptDependenciesVue(script);
+  const styleDependencyPaths = collectStylesDependenciesVue(styles);
   const dependencyPaths = [].concat(scriptDependencyPaths).concat(styleDependencyPaths);
   return dependencyPaths;
 }
 
-async function parseDependencyVue(filePath) {
+async function resolveDependencyVue(filePath) {
   const content = await readFile(filePath);
-  const dependencyPaths = parseDependencyVueContent(content);
+  const dependencyPaths = resolveDependencyVueByContent(content);
   return {
     path: filePath,
     absolutePath: filePath,
@@ -40,8 +40,9 @@ async function parseDependencyVue(filePath) {
 }
 
 module.exports = {
-  parseDependencyVue,
-  parseDependencyVueContent,
-  collectScriptDependencies,
-  collectStylesDependencies,
+  parseComponent,
+  resolveDependencyVue,
+  resolveDependencyVueByContent,
+  collectScriptDependenciesVue,
+  collectStylesDependenciesVue,
 };
