@@ -40,5 +40,4 @@ function resolveModuleInfoExternal(requireName, rootPath) {
 module.exports = {
   isExternalModule,
   resolveModuleInfoExternal,
-  resolveExternalModuleName,
 };
