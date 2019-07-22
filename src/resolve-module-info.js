@@ -9,7 +9,7 @@ const {
 } = require('./resolve-module-info-external');
 
 function resolveModuleFileType(filePath) {
-  const ext = path.extname(filePath);
+  const ext = path.extname(filePath || '');
   return ext.substr(1);
 }
 
@@ -17,8 +17,13 @@ function resolveModuleFilePath(moduleName, root) {
   let filePath = moduleName;
   let fileMatched = false;
   if (root) {
-    const rootDirname = path.dirname(root);
-    filePath = path.resolve(rootDirname, moduleName);
+    const rootStat = fs.statSync(root);
+    if (rootStat.isDirectory()) {
+      filePath = path.resolve(root, moduleName);
+    } else if (rootStat.isFile()) {
+      const rootDirname = path.dirname(root);
+      filePath = path.resolve(rootDirname, moduleName);
+    }
   }
 
   // found dir or file
