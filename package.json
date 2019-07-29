@@ -1,5 +1,5 @@
 {
-  "name": "puffjs",
+  "name": "puffs",
   "version": "0.0.1",
   "description": "puff",
   "main": "src/index.js",
@@ -22,6 +22,11 @@
   },
   "homepage": "https://github.com/elcarim5efil/puff#readme",
   "dependencies": {
+    "fs-extra": "^8.1.0",
+    "precinct": "^6.1.2",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "devDependencies": {
     "eslint": "^6.0.1",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-plugin-import": "^2.18.0",
@@ -29,11 +34,6 @@
     "eslint-plugin-react": "^7.14.2",
     "husky": "^3.0.0",
     "lint-staged": "^9.0.2",
-    "fs-extra": "^8.1.0",
-    "precinct": "^6.1.2",
-    "vue-template-compiler": "^2.6.10"
-  },
-  "devDependencies": {
     "codecov": "^3.5.0",
     "jest": "^24.8.0"
   },
