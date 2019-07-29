@@ -8,7 +8,8 @@
     "test:ci": "jest --ci --coverage",
     "test:dev": "jest --watchAll --coverage",
     "lint": "eslint \"src/**/*.js\"",
-    "lint-fix": "eslint \"src/**/*.js\" --fix"
+    "lint-fix": "eslint \"src/**/*.js\" --fix",
+    "coveralls": "cat ./coverage/lcov.info | \"./node_modules/coveralls/bin/coveralls.js\""
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "vue-template-compiler": "^2.6.10"
   },
   "devDependencies": {
+    "coveralls": "^3.0.5",
     "jest": "^24.8.0"
   },
   "lint-staged": {
