@@ -53,6 +53,25 @@ describe('resolveModuleFilePath', () => {
     const res = await resolveModuleFilePath(path.resolve(__dirname, '../fixtures/modules/a'));
     expect(res).toEqual(path.resolve(__dirname, '../fixtures/modules/a.js'));
   });
+
+  // resolve .vue extension
+  test('resolve .vue extension', async () => {
+    const root = path.resolve(__dirname, '../fixtures/vue');
+    const res = await resolveModuleFilePath('./components/a', root);
+    expect(res).toBe(
+      path.resolve(__dirname, '../fixtures/vue/components/a/index.vue'),
+    );
+  });
+
+  // root not exists
+  test('throw error when not exists root', async () => {
+    const root = path.resolve(__dirname, '../not-found/');
+    try {
+      await resolveModuleFilePath(path.resolve(__dirname, '../a'), root);
+    } catch (err) {
+      expect(err).toEqual(new Error(`module root not exists: ${root}`));
+    }
+  });
 });
 
 describe('resolveModuleInfo', () => {
@@ -66,22 +85,24 @@ describe('resolveModuleInfo', () => {
       type: 'js',
       dependencyPaths: [],
     });
-
-    // using cache
-    const cacheRes = await resolveModuleInfo('./a.js', root);
-    expect(cacheRes).toEqual({
-      name: './a.js',
-      external: false,
-      filePath: path.resolve(__dirname, '../fixtures/modules/a.js'),
-      type: 'js',
-      dependencyPaths: [],
-    });
   });
 
   test('import-a.js', async () => {
     const root = path.resolve(__dirname, '../fixtures/modules');
     const res = await resolveModuleInfo('./import-a.js', root);
     expect(res).toEqual({
+      name: './import-a.js',
+      external: false,
+      filePath: path.resolve(__dirname, '../fixtures/modules/import-a.js'),
+      type: 'js',
+      dependencyPaths: [
+        './a',
+      ],
+    });
+
+    // using cache
+    const cacheRes = await resolveModuleInfo('./import-a.js', root);
+    expect(cacheRes).toEqual({
       name: './import-a.js',
       external: false,
       filePath: path.resolve(__dirname, '../fixtures/modules/import-a.js'),

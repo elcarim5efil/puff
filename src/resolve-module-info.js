@@ -17,10 +17,13 @@ function resolveModuleFilePath(moduleName, root) {
   let filePath = moduleName;
   let fileMatched = false;
   if (root) {
+    if (!fs.existsSync(root)) {
+      throw new Error(`module root not exists: ${root}`);
+    }
     const rootStat = fs.statSync(root);
     if (rootStat.isDirectory()) {
       filePath = path.resolve(root, moduleName);
-    } else if (rootStat.isFile()) {
+    } else {
       const rootDirname = path.dirname(root);
       filePath = path.resolve(rootDirname, moduleName);
     }
@@ -55,7 +58,7 @@ function resolveModuleFilePath(moduleName, root) {
   return filePath;
 }
 
-const moduleInfoCache = {};
+const moduleInfoDependencyPathsCache = {};
 async function resolveModuleInfo(requireName, root, options = {}) {
   const moduleName = resolveAliasPath(requireName, options.alias);
   const info = {
@@ -76,10 +79,10 @@ async function resolveModuleInfo(requireName, root, options = {}) {
     });
   }
 
-  if (info.filePath && !info.dependencyPaths) {
-    const cachedModuleInfo = moduleInfoCache[info.filePath];
-    if (cachedModuleInfo) {
-      info.dependencyPaths = cachedModuleInfo.dependencyPaths;
+  if (!info.external && info.filePath && !info.dependencyPaths) {
+    const cachedModuleInfoDependencyPaths = moduleInfoDependencyPathsCache[info.filePath];
+    if (cachedModuleInfoDependencyPaths) {
+      info.dependencyPaths = cachedModuleInfoDependencyPaths;
     } else if (info.type === 'vue') {
       const { dependencyPaths } = await resolveDependencyVue(info.filePath);
       info.dependencyPaths = dependencyPaths;
@@ -87,6 +90,7 @@ async function resolveModuleInfo(requireName, root, options = {}) {
       const { dependencyPaths } = await resolveDependency(info.filePath);
       info.dependencyPaths = dependencyPaths;
     }
+    moduleInfoDependencyPathsCache[info.filePath] = info.dependencyPaths;
   }
 
   return info;
