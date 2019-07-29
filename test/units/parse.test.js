@@ -1,5 +1,5 @@
 const path = require('path');
-const { parseDependencyRecursive } = require('../../src/parse-dependency-recursive');
+const { parseDependencyRecursive } = require('../../src/parse');
 
 const cwd = process.cwd();
 function resolvePath(...args) {
@@ -52,7 +52,6 @@ describe('parseDependencyRecursive', () => {
     const res = await parseDependencyRecursive(entryPath);
     const {
       maxDepth,
-      // flattenDependencyFilePaths,
       entry,
     } = res;
 
@@ -61,6 +60,47 @@ describe('parseDependencyRecursive', () => {
     expect(entry.dependencies[0].depth).toBe(1);
     expect(entry.dependencies[1].depth).toBe(1);
     expect(entry.dependencies[1].dependencies[0].depth).toBe(2);
+  });
+
+  test('alias', async () => {
+    const entryPath = resolvePath('test/fixtures/modules/alias/index.js');
+    const res = await parseDependencyRecursive(entryPath, {
+      alias: {
+        '@': resolvePath('test/fixtures/modules/alias/src/'),
+      },
+    });
+
+    const {
+      flattenDependencyFilePaths,
+    } = res;
+
+    expect(flattenDependencyFilePaths).toEqual([
+      resolvePath('test/fixtures/modules/alias/index.js'),
+      resolvePath('test/fixtures/modules/alias/src/a.js'),
+      resolvePath('test/fixtures/modules/alias/src/b.js'),
+    ]);
+  });
+
+  test('externals', async () => {
+    const entryPath = resolvePath('test/fixtures/modules/externals/index.js');
+    const res = await parseDependencyRecursive(entryPath);
+
+    const {
+      externals,
+    } = res;
+
+    expect(externals).toEqual([
+      {
+        name: 'lodash',
+        filePath: null,
+        external: true,
+        type: null,
+        requireName: 'lodash',
+        moduleName: 'lodash',
+        dependencyType: 'dependencies',
+        version: '^4.17.14',
+      },
+    ]);
   });
 
   // test('circle\'s depth', async () => {
