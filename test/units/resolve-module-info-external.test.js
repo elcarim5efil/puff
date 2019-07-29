@@ -79,4 +79,10 @@ describe('resolveModuleInfoExternal', () => {
       version: 'latest',
     });
   });
+
+  test('resolve devDependencies without pacakge.json', () => {
+    const root = path.resolve(__dirname, '/a');
+    const res = resolveModuleInfoExternal('cannot find', root);
+    expect(res).toEqual({});
+  });
 });
