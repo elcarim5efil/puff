@@ -1,7 +1,8 @@
-const { parseDependencyRecursive } = require('./parse-dependency-recursive');
+const { parseDependencyRecursive } = require('./parse');
 const { findCircle } = require('./find-circle');
 
 module.exports = {
+  parse: parseDependencyRecursive,
   parseDependencyRecursive,
   findCircle,
 };
