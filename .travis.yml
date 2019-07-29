@@ -12,5 +12,5 @@ install:
 - yarn 
 
 script:
-- yarn test:ci
-- yarn coveralls
+- npm run test:ci
+- npm run codecov
