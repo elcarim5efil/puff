@@ -16,7 +16,7 @@ function resolveModuleFileType(filePath) {
 function resolveModuleFilePath(moduleName, root) {
   let filePath = moduleName;
   let fileMatched = false;
-  if (root) {
+  if (moduleName.startsWith('.') && root) {
     if (!fs.existsSync(root)) {
       throw new Error(`module root not exists: ${root}`);
     }

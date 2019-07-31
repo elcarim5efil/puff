@@ -23,28 +23,28 @@ describe('resolveModuleFileType', () => {
 describe('resolveModuleFilePath', () => {
   test('require(\'./file.js\')', async () => {
     const root = path.resolve(__dirname, '../fixtures/modules');
-    const res = await resolveModuleFilePath('a.js', root);
+    const res = await resolveModuleFilePath('./a.js', root);
     expect(res).toEqual(path.resolve(__dirname, '../fixtures/modules/a.js'));
   });
 
   // require('./file.js');
   test('require(\'./file.js\')', async () => {
     const root = path.resolve(__dirname, '../fixtures/modules/b.js');
-    const res = await resolveModuleFilePath('a.js', root);
+    const res = await resolveModuleFilePath('./a.js', root);
     expect(res).toEqual(path.resolve(__dirname, '../fixtures/modules/a.js'));
   });
 
   // require('./file');
   test('require(\'./file\')', async () => {
     const root = path.resolve(__dirname, '../fixtures/modules/b.js');
-    const res = await resolveModuleFilePath('a', root);
+    const res = await resolveModuleFilePath('./a', root);
     expect(res).toEqual(path.resolve(__dirname, '../fixtures/modules/a.js'));
   });
 
   // require('./dir');
   test('require(\'./dir\')', async () => {
     const root = path.resolve(__dirname, '../fixtures/');
-    const res = await resolveModuleFilePath('modules/dir-module', root);
+    const res = await resolveModuleFilePath('./modules/dir-module', root);
     expect(res).toEqual(path.resolve(__dirname, '../fixtures/modules/dir-module/index.js'));
   });
 
@@ -67,10 +67,17 @@ describe('resolveModuleFilePath', () => {
   test('throw error when not exists root', async () => {
     const root = path.resolve(__dirname, '../not-found/');
     try {
-      await resolveModuleFilePath(path.resolve(__dirname, '../a'), root);
+      await resolveModuleFilePath('../a', root);
     } catch (err) {
       expect(err).toEqual(new Error(`module root not exists: ${root}`));
     }
+  });
+
+  // require('moduleName'); with root
+  test('require(\'moduleName\') with root', async () => {
+    const root = path.resolve(__dirname, '../fixtures/modules/b.js');
+    const res = await resolveModuleFilePath('a', root);
+    expect(res).toEqual('a');
   });
 });
 
