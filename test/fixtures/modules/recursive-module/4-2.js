@@ -1,2 +1,2 @@
-const one = require('./4-1');
-const two = require('./1');
+require('./4-1');
+require('./1');

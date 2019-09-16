@@ -1,1 +1,1 @@
-const one = require('./4-2');
+require('./4-2');

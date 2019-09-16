@@ -1,1 +1,1 @@
-const one = require('./3.js');
+require('./3.js');
