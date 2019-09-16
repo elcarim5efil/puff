@@ -24,7 +24,11 @@ async function parseDependencyRecursive(modulePath, options = {}) {
     // process dependencies
     for (let i = 0; i < currentModule.dependencyPaths.length; i += 1) {
       const dependencyPath = currentModule.dependencyPaths[i];
-      const dependencyModuleInfo = await resolveModuleInfo(dependencyPath, currentModule.filePath, options);
+      const dependencyModuleInfo = await resolveModuleInfo(
+        dependencyPath,
+        currentModule.filePath,
+        options,
+      );
       let dependencyModule;
       if (moduleCache[dependencyModuleInfo.filePath]) {
         dependencyModule = Object.assign({}, moduleCache[dependencyModuleInfo.filePath]);
